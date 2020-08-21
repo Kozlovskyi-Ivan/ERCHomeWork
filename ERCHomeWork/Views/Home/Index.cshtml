@@ -1,0 +1,282 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h2>Добро пожаловать в мир jQuery</h2>
+    <button id="btn1">jQuery</button>
+    <button id="btn2" onclick="alert('Мир JavaScript'); ">JavaScript</button>
+
+    <div>
+        <button href="#" class="btn btn-info" onclick="AddNewCar()">Add New Student</button> <br /><br />
+        <table id="car_table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Mileage</th>
+                    <th>Data</th>
+                    <th>Model</th>
+                    <th>Brand</th>
+                </tr>
+            </thead>
+            <tbody id="SetCarList">
+                <tr id="LoadingStatus" style="color:red"></tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="dialog" title="Create new user">
+        <p class="validateTips">All form fields are required.</p>
+        <form>
+            <fieldset>
+                <div>
+                    <label for="Number">Number</label>
+                    <input type="text" name="NumberD" id="NumberD" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Mileage">Mileage</label>
+                    <input type="text" name="Mileage" id="Mileage" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Data">Data</label>
+                    <input type="datetime" name="Data" id="Data" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Brand">Brand</label>
+                    @*<input type="text" name="Model" id="Model" value="" class="text ui-widget-content ui-corner-all">*@
+                    <select id="Brand">
+                        <option value="">-</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Model">Model</label>
+                    @*<input type="text" name="Model" id="Model" value="" class="text ui-widget-content ui-corner-all">*@
+                    <select id="Model">
+                        <option value="">-</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Mileage">Mileage</label>
+                    <input type="text" name="Brand" id="Brand" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+    </div>
+
+    @*<button id="opener">Open Dialog</button>*@
+
+    @*<div id="users-contain" class="ui-widget">
+            <h1>Existing Users:</h1>
+            <table id="users" class="ui-widget ui-widget-content">
+                <thead>
+                    <tr class="ui-widget-header ">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Doe</td>
+                        <td>john.doe@example.com</td>
+                        <td>johndoe1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>*@
+
+    @*<button id="create-user" value="">Create new user</button>*@
+    <button id="opener" value="">opener</button>
+    <script type="text/javascript">
+
+        //var Numbers = [];
+        $("#LoadingStatus").html("Loading....");
+        $(document).ready(function () {
+            $.getJSON("http://localhost:5000/api/Cars/GetCars", function (data) {
+                var car_data = '';
+                $.each(data, function (key, value) {
+                    //Number += value.Number;
+                    car_data += '<tr>';
+                    car_data += '<td>' + value.number + '</td>';
+                    car_data += '<td>' + value.mileage + '</td>';
+                    car_data += '<td>' + value.data + '</td>';
+                    car_data += '<td>' + value.model + '</td>';
+                    car_data += '<td>' + value.brand + '</td>';
+                    //car_data += "<td>" + "<button id='create' '>Edit</button>" + "</td>";
+                    //alert("<td>" + "<button id='opener" + key + "'>Create new user</button>" + "</td>");
+                    //car_data += "<td>" + "<button id='opener'>Create new user</button>" + "</td>";
+                    car_data += "<td>" + "<a href='#' id='opener' class='btn btn-warning' data='" + value.number + "' ><span class='glyphicon glyphicon-edit'>edit</span></a>" + "</td>";
+                    car_data += "<td>" + "<a href='#' class='btn btn-danger' onclick='DeleteStudentRecord(" + value.number + ")'><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
+                    car_data += '</tr>';
+                });
+                //$('#car_table').append(car_data);
+                $('#SetCarList').append(car_data);
+                $("#LoadingStatus").html(" ");
+
+            });
+        });
+        //$(function () {
+        //    $("#btn").click(function () {
+        //        //$(this).css('background-color', 'red');
+        //        alert('Мир jQuery');
+        //    });
+        //});
+        //Show The Popup Modal For Add New Student
+        function AddNewCar() {
+            //$("#form")[0].reset();
+            //$("#StuId").val(0);
+            //$("#DropDwn option:selected").text("--Select Dept--");
+            //$("#ModalTitle").html("Add New Student");
+            //$("#MyModal").modal();
+            $("#dialog").dialog({
+                autoOpen: false,
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+            $("#dialog").dialog("open");
+
+        }
+        //Show The Popup Modal For Edit Student Record
+        function EditRecord(Id) {
+            var url = "http://localhost:5000/api/Cars/" + Id;
+            $("#ModalTitle").html("Update Student Record");
+            $("#MyModal").modal();
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    $("#name").val(obj.number);
+                    //$("#StuName").val(obj.StudentName);
+                    //$("#Email").val(obj.Email);
+                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+                    //$("#DropDwn option:selected").val(obj.DepartmentId);
+
+                }
+            })
+        }
+
+        //$(document).ready(function () {
+        //    var dialog, form,
+        //        number = $("#number"),
+        //        mileage = $("#mileage"),
+        //        data = $("#data"),
+        //        model = $("#model"),
+        //        brand = $("#brand"),
+
+        //        allFields = $([]).add(number).add(mileage).add(data).add(model).add(brand),
+        //        tips = $(".validateTips");
+
+
+        //    function addUser() {
+        //        var valid = true;
+        //        allFields.removeClass("ui-state-error");
+        //        if (valid) {
+        //            $("#users tbody").append("<tr>" +
+        //                "<td>" + name.val() + "</td>" +
+        //                "<td>" + email.val() + "</td>" +
+        //                "<td>" + password.val() + "</td>" +
+        //                "</tr>");
+        //            dialog.dialog("close");
+        //        }
+        //        return valid;
+        //    }
+
+        //    dialog = $("#dialog-form").dialog({
+        //        autoOpen: false,
+        //        height: 400,
+        //        width: 350,
+        //        modal: true,
+        //        buttons: {
+        //            "Create an account": addUser,
+        //            Cancel: function () {
+        //                dialog.dialog("close");
+        //            }
+        //        },
+        //        close: function () {
+        //            form[0].reset();
+        //            allFields.removeClass("ui-state-error");
+        //        }
+        //    });
+
+        //    form = dialog.find("form").on("submit", function (event) {
+        //        event.preventDefault();
+        //        addUser();
+        //    });
+
+        //    $("#create-user").button().on("click", function () {
+        //        alert('asd');
+        //        dialog.dialog("open");
+        //    });
+        //});
+        ///////
+        //$(function () {
+        //    $("#create").button().on("click", function () {
+        //        alert('asd');
+        //        dialog.dialog("open");
+        //    });
+        //});
+        $(function () {
+            $("#dialog").dialog({
+                autoOpen: false,
+                show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 2000
+                }
+            });
+
+            //$("#opener1").on("click", function () {
+            //    $("#dialog").dialog("open");
+            //});
+        });
+
+
+        $(document).on('click', '#opener', function () {
+            //alert('asd');
+            $("#dialog").dialog("open");
+            //alert($(this).attr("data"));
+            var url = "http://localhost:5000/api/Cars/" + $(this).attr("data");
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:5000/api/Cars/Brands",
+                success: function (data) {
+                    $("#Brand option:selected").text(data.brand.DepartmentName);
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function (data) {
+                    //var obj = JSON.parse(data);
+                    $("#NumberD").val(data.number);
+                    $("#Mileage").val(data.mileage);
+                    $("#Data").val(data.data);
+                    //$("#Model").val(data.model);
+                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+                    $("#Brand option:selected").val(data.brand);
+
+                    ////$("#Mileage").value = data.mileage;
+                    //$("#Mileage").val(obj.Mileage);
+                    //$("#StuName").val(obj.StudentName);
+                    //$("#Email").val(obj.Email);
+                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+                    //$("#DropDwn option:selected").val(obj.DepartmentId);
+
+                }
+            })
+        });
+    </script>
+</div>
