@@ -32,7 +32,6 @@ namespace ERCHomeWork.Controllers
                 Car car4 = new Car() { Number = "num4", Data = DateTime.UtcNow, Mileage = 123, CarModel = model2 };
                 context.Cars.AddRange(car, car2, car3, car4);
                 context.SaveChanges();
-
             }
         }
         //// GET: api/Cars
@@ -44,7 +43,7 @@ namespace ERCHomeWork.Controllers
         //    return context.Cars.Include(x=>x.CarModel).ThenInclude(x=>x.Brand).ToList();
         //}
         // GET: api/Cars
-        [Route("/GetCars")]
+        [Route("GetCars")]
         [HttpGet]
         public List<CarResult> Get()
         {
@@ -52,8 +51,9 @@ namespace ERCHomeWork.Controllers
             var cars = (from item in context.Cars.Include(x => x.CarModel).ThenInclude(x => x.Brand)
                        select new CarResult{
                            Number=item.Number ,
-                           Data=item.Data, 
-                           Mileage=item.Mileage, 
+                           //Data=item.Data,
+                           Data = item.Data.ToShortDateString(),
+                           Mileage = item.Mileage, 
                            Model=item.CarModel.Model, 
                            Brand=item.CarModel.Brand.Name}).ToList();
             return cars;
@@ -62,19 +62,26 @@ namespace ERCHomeWork.Controllers
 
         // GET: api/Cars/5
         [HttpGet("Car/{id}")]
-        public Car Get(string id)
+        public ActionResult<CarResult> Get(string id)
         {
-            return context.Cars.FirstOrDefault((x) => x.Number == id);
+            var car= context.Cars.Include(x=>x.CarModel).ThenInclude(x=>x.Brand).FirstOrDefault((x) => x.Number == id);
+            if (car!=null)
+            {
+                //return new CarResult() { Number = car.Number, Mileage = car.Mileage, Data = car.Data, Brand = car.CarModel.Brand.Name, Model = car.CarModel.Model };
+                return new CarResult() { Number = car.Number, Mileage = car.Mileage, Data = car.Data.ToShortDateString(), Brand = car.CarModel.Brand.Name, Model = car.CarModel.Model };
+
+            }
+            return BadRequest("No car"); ;
         }
         // GET: api/Cars/5
-        [Route("/Brands")]
+        [Route("Brands")]
         [HttpGet]
         public List<Brand> GetBrands()
         {
             return context.Brands.ToList();
         }        
         // GET: api/Cars/5
-        [Route("/Models")]
+        [Route("Models/{brand}")]
         [HttpGet("{brand}")]
         public List<CarModel> GetModels(string brand)
         {
@@ -82,28 +89,46 @@ namespace ERCHomeWork.Controllers
         }
 
         // POST: api/Cars
-        [Route("~/api/AddCar")]
+        [Route("AddCar")]
         [HttpPost]
-        public IActionResult AddCar([FromBody] Car car)
+        public IActionResult AddCar(CarResult car)
         {
-            context.Cars.Add(car);
-            context.SaveChanges();
-            return Ok($"Add car {car.Number}");
+            //var carS = new Car { Number = car.Number, Mileage = car.Mileage, Data = car.Data.Date, CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) } ;
+            var carS = new Car { Number = car.Number, Mileage = car.Mileage, Data = Convert.ToDateTime(car.Data), CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) };
+            if (carS != null)
+            {
+                //context.Cars.Add(new Car { Number = car.Number, Mileage = car.Mileage, Data = car.Data, CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) });
+                context.Cars.Add(new Car { Number = car.Number, Mileage = car.Mileage, Data = Convert.ToDateTime(car.Data), CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) });
+                context.SaveChanges();
+                return Ok($"Add car {car.Number}");
+
+            }
+            return BadRequest("No car"); 
         }
 
         // PUT: api/Cars/5
-        [Route("~/api/UpdateCar")]
+        [Route("UpdateCar")]
         [HttpPut("{id}")]
-        public IActionResult Put([FromBody] Car car)
+        public IActionResult Put([FromBody] CarResult car)
         {
-            context.Cars.Update(car);
-            context.SaveChanges();
-            return Ok($"Update car {car.Number}");
+            var carS = new Car { Number = car.Number, Mileage = car.Mileage, Data = Convert.ToDateTime(car.Data), CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) };
+            if (carS != null)
+            {
+                //context.Cars.Add(new Car { Number = car.Number, Mileage = car.Mileage, Data = car.Data, CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) });
+                context.Cars.Update(new Car { Number = car.Number, Mileage = car.Mileage, Data = Convert.ToDateTime(car.Data), CarModel = context.CarModels.FirstOrDefault(x => x.Model == car.Model) });
+                context.SaveChanges();
+                return Ok($"Update car {carS.Number}");
+
+            }
+            return BadRequest("No car");
+            //context.Cars.Update(car);
+            //context.SaveChanges();
+            //return Ok($"Update car {car.Number}");
 
         }
 
         // DELETE: api/ApiWithActions/5
-        [Route("~/api/Delete/{id}")]
+        [Route("Delete/{id}")]
         [HttpDelete]
         //[HttpDelete("{id}")]
         public IActionResult Delete(string id)

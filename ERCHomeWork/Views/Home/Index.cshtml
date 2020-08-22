@@ -10,7 +10,7 @@
     <button id="btn2" onclick="alert('Мир JavaScript'); ">JavaScript</button>
 
     <div>
-        <button href="#" class="btn btn-info" onclick="AddNewCar()">Add New Student</button> <br /><br />
+        <button id="opener" class="btn btn-info" @*onclick="AddNewCar()"*@>Add New Student</button> <br /><br />
         <table id="car_table">
             <thead>
                 <tr>
@@ -28,7 +28,7 @@
     </div>
     <div id="dialog" title="Create new user">
         <p class="validateTips">All form fields are required.</p>
-        <form>
+        @*<form>*@
             <fieldset>
                 <div>
                     <label for="Number">Number</label>
@@ -44,26 +44,23 @@
                 </div>
                 <div>
                     <label for="Brand">Brand</label>
-                    @*<input type="text" name="Model" id="Model" value="" class="text ui-widget-content ui-corner-all">*@
                     <select id="Brand">
-                        <option value="">-</option>
+                        @*<option value="">-</option>*@
                     </select>
                 </div>
                 <div>
                     <label for="Model">Model</label>
-                    @*<input type="text" name="Model" id="Model" value="" class="text ui-widget-content ui-corner-all">*@
                     <select id="Model">
-                        <option value="">-</option>
                     </select>
                 </div>
-                <div>
-                    <label for="Mileage">Mileage</label>
-                    <input type="text" name="Brand" id="Brand" value="" class="text ui-widget-content ui-corner-all">
-                </div>
+                <button id="AddCarB">Add Car</button>
+                <button id="EditCarB">Edit Car</button>
+                <button id="CloseCarB" class="ui-widget-content ui-corner-all">Close</button>
+
                 <!-- Allow form submission with keyboard without duplicating the dialog button -->
                 <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
             </fieldset>
-        </form>
+        @*</form>*@
     </div>
 
     @*<button id="opener">Open Dialog</button>*@
@@ -93,9 +90,37 @@
     <script type="text/javascript">
 
         //var Numbers = [];
+        
         $("#LoadingStatus").html("Loading....");
-        $(document).ready(function () {
+        $(document).ready(start()
+        //    function () {
+        //    $.getJSON("http://localhost:5000/api/Cars/GetCars", function (data) {
+        //        var car_data = '';
+        //        $.each(data, function (key, value) {
+        //            //Number += value.Number;
+        //            car_data += '<tr>';
+        //            car_data += '<td>' + value.number + '</td>';
+        //            car_data += '<td>' + value.mileage + '</td>';
+        //            car_data += '<td>' + value.data + '</td>';
+        //            car_data += '<td>' + value.model + '</td>';
+        //            car_data += '<td>' + value.brand + '</td>';
+        //            //car_data += "<td>" + "<button id='create' '>Edit</button>" + "</td>";
+        //            //alert("<td>" + "<button id='opener" + key + "'>Create new user</button>" + "</td>");
+        //            //car_data += "<td>" + "<button id='opener'>Create new user</button>" + "</td>";
+        //            car_data += "<td>" + "<a href='#' id='opener' class='btn btn-warning' data='" + value.number + "' ><span class='glyphicon glyphicon-edit'>edit</span></a>" + "</td>";
+        //            car_data += "<td>" + "<a href='#' class='btn btn-danger'(" + value.number + "><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
+        //            car_data += '</tr>';
+        //        });
+        //        //$('#car_table').append(car_data);
+        //        $('#SetCarList').append(car_data);
+        //        $("#LoadingStatus").html(" ");
+
+        //    });
+        //}
+        );
+        function start() {
             $.getJSON("http://localhost:5000/api/Cars/GetCars", function (data) {
+                $('#SetCarList').empty();
                 var car_data = '';
                 $.each(data, function (key, value) {
                     //Number += value.Number;
@@ -109,7 +134,7 @@
                     //alert("<td>" + "<button id='opener" + key + "'>Create new user</button>" + "</td>");
                     //car_data += "<td>" + "<button id='opener'>Create new user</button>" + "</td>";
                     car_data += "<td>" + "<a href='#' id='opener' class='btn btn-warning' data='" + value.number + "' ><span class='glyphicon glyphicon-edit'>edit</span></a>" + "</td>";
-                    car_data += "<td>" + "<a href='#' class='btn btn-danger' onclick='DeleteStudentRecord(" + value.number + ")'><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
+                    car_data += "<td>" + "<a href='#' id='delete' class='btn btn-danger' data='" + value.number + "'><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
                     car_data += '</tr>';
                 });
                 //$('#car_table').append(car_data);
@@ -117,7 +142,7 @@
                 $("#LoadingStatus").html(" ");
 
             });
-        });
+        }
         //$(function () {
         //    $("#btn").click(function () {
         //        //$(this).css('background-color', 'red');
@@ -125,45 +150,45 @@
         //    });
         //});
         //Show The Popup Modal For Add New Student
-        function AddNewCar() {
-            //$("#form")[0].reset();
-            //$("#StuId").val(0);
-            //$("#DropDwn option:selected").text("--Select Dept--");
-            //$("#ModalTitle").html("Add New Student");
-            //$("#MyModal").modal();
-            $("#dialog").dialog({
-                autoOpen: false,
-                show: {
-                    effect: "blind",
-                    duration: 1000
-                },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                }
-            });
-            $("#dialog").dialog("open");
+        //function AddNewCar() {
+        //    //$("#form")[0].reset();
+        //    //$("#StuId").val(0);
+        //    //$("#DropDwn option:selected").text("--Select Dept--");
+        //    //$("#ModalTitle").html("Add New Student");
+        //    //$("#MyModal").modal();
+        //    //$("#dialog").dialog({
+        //    //    autoOpen: false,
+        //    //    show: {
+        //    //        effect: "blind",
+        //    //        duration: 1000
+        //    //    },
+        //    //    hide: {
+        //    //        effect: "explode",
+        //    //        duration: 1000
+        //    //    }
+        //    //});
+        //    $("#dialog").dialog("open");
 
-        }
-        //Show The Popup Modal For Edit Student Record
-        function EditRecord(Id) {
-            var url = "http://localhost:5000/api/Cars/" + Id;
-            $("#ModalTitle").html("Update Student Record");
-            $("#MyModal").modal();
-            $.ajax({
-                type: "GET",
-                url: url,
-                success: function (data) {
-                    var obj = JSON.parse(data);
-                    $("#name").val(obj.number);
-                    //$("#StuName").val(obj.StudentName);
-                    //$("#Email").val(obj.Email);
-                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
-                    //$("#DropDwn option:selected").val(obj.DepartmentId);
+        //}
+        ////Show The Popup Modal For Edit Student Record
+        //function EditRecord(Id) {
+        //    var url = "http://localhost:5000/api/Cars/" + Id;
+        //    $("#ModalTitle").html("Update Student Record");
+        //    $("#MyModal").modal();
+        //    $.ajax({
+        //        type: "GET",
+        //        url: url,
+        //        success: function (data) {
+        //            var obj = JSON.parse(data);
+        //            $("#name").val(obj.number);
+        //            //$("#StuName").val(obj.StudentName);
+        //            //$("#Email").val(obj.Email);
+        //            //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+        //            //$("#DropDwn option:selected").val(obj.DepartmentId);
 
-                }
-            })
-        }
+        //        }
+        //    })
+        //}
 
         //$(document).ready(function () {
         //    var dialog, form,
@@ -233,50 +258,187 @@
                     duration: 1000
                 },
                 hide: {
-                    effect: "explode",
-                    duration: 2000
+                    effect: "blind",
+                    duration: 1000, function() {
+                        $('#dialog').html('');
+                    }
                 }
             });
-
-            //$("#opener1").on("click", function () {
-            //    $("#dialog").dialog("open");
-            //});
         });
-
-
         $(document).on('click', '#opener', function () {
             //alert('asd');
+            $("#AddCarB").show();
+            $("#EditCarB").hide();
             $("#dialog").dialog("open");
+            $("#NumberD").val(null);
+            $("#Mileage").val(null);
+            $("#Data").val(null);
+            $("#Model").empty();
+
+            $("#Brand").empty();
             //alert($(this).attr("data"));
-            var url = "http://localhost:5000/api/Cars/" + $(this).attr("data");
+            var url = "http://localhost:5000/api/Cars/Car/" + $(this).attr("data");
             $.ajax({
                 type: "GET",
                 url: "http://localhost:5000/api/Cars/Brands",
                 success: function (data) {
-                    $("#Brand option:selected").text(data.brand.DepartmentName);
+                    //$("#Brand option:selected").text(data.brand.name);
+                    $("#Brand").append(`<option value=""</option>`);
+                    for (var i = 0; i < data.length; i++) {
+                        console.log(data[i].name);
+                        $("#Brand").append(`<option value="${data[i].name}">${data[i].name}</option>`);
+                    }
+                    //$("#Brand").append(`<option value="adsa">asda</option>`);
                 }
-            });
+            })
+            if ($(this).attr("data") != undefined) {
+                $("#AddCarB").hide();
+                $("#EditCarB").show();
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    success: function (data) {
+                        //ModelLoad(data.brand);
+
+                        //ModelLoad(data.model);
+                        //var obj = JSON.parse(data);
+                        $("#NumberD").val(data.number);
+                        $("#Mileage").val(data.mileage);
+                        $("#Data").val(data.data);
+                        //$("#Model").val(data.model);
+                        //$("#Brand option:selected").text(data.brand);
+                        $("#Brand").val(data.brand);
+
+
+                        ModelLoad(data.model);
+                        //$("#Model").val(data.model);
+                        //alert($("#Model option:selected").text());
+                        //$("#Brand option:selected").val(data.brand);
+
+                        ////$("#Mileage").value = data.mileage;
+                        //$("#Mileage").val(obj.Mileage);
+                        //$("#StuName").val(obj.StudentName);
+                        //$("#Email").val(obj.Email);
+                        //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
+                        //$("#DropDwn option:selected").val(obj.DepartmentId);
+
+                    }
+                })
+            }
+        });
+
+        $(document).on('click', '#AddCarB', function () {
+            //alert('asd');
+            //$("#AddCarB").show();
+            //$("#EditCarB").hide();
+            //$("#dialog").dialog("open");
+            //console.log( $("#NumberD").val());
+            //$("#Mileage").val(null);
+            //$("#Data").val(null);
+            //$("#Model").empty();
+
+            var url = '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }';
             $.ajax({
-                type: "GET",
-                url: url,
-                success: function (data) {
-                    //var obj = JSON.parse(data);
-                    $("#NumberD").val(data.number);
-                    $("#Mileage").val(data.mileage);
-                    $("#Data").val(data.data);
-                    //$("#Model").val(data.model);
-                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
-                    $("#Brand option:selected").val(data.brand);
+                type: "POST",
+                url: "http://localhost:5000/api/Cars/AddCar",
+                data: '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }',
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    $("#dialog").dialog('close');
+                    start();
 
-                    ////$("#Mileage").value = data.mileage;
-                    //$("#Mileage").val(obj.Mileage);
-                    //$("#StuName").val(obj.StudentName);
-                    //$("#Email").val(obj.Email);
-                    //$("#DropDwn option:selected").text(obj.tblDepartment.DepartmentName);
-                    //$("#DropDwn option:selected").val(obj.DepartmentId);
 
+                    //$("#Brand option:selected").text(data.brand.name);
+                    //$("#Brand").append(`<option value="adsa">asda</option>`);
                 }
             })
         });
+        $("#Brand").change(function () {
+            ModelLoad();
+            //console.log($("#Brand option:selected").text());
+            //$("#Model").empty();
+            //$.ajax({
+            //    type: "GET",
+            //    url: "http://localhost:5000/api/Cars/Models/" + $("#Brand option:selected").text(),
+            //    success: function (data) {
+            //        //$("#Brand option:selected").text(data.brand.name);
+            //        $("#Model").append(`<option value=""</option>`);
+            //        for (var i = 0; i < data.length; i++) {
+            //            console.log(data[i].model+"1");
+            //            $("#Model").append(`<option value="${data[i].model}">${data[i].model}</option>`);
+
+            //        }
+            //        //$("#Brand").append(`<option value="adsa">asda</option>`);
+
+            //    }
+            //})
+            //alert($("#Brand".val));
+        });
+        function ModelLoad(model) {
+            $("#Model").empty();
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:5000/api/Cars/Models/" + $("#Brand option:selected").text(),
+                success: function (data) {
+                    //$("#Brand option:selected").text(data.brand.name);
+                    $("#Model").empty();
+
+                    $("#Model").append(`<option value=""</option>`);
+                    for (var i = 0; i < data.length; i++) {
+                        //console.log(data[i].model);
+                        $("#Model").append(`<option value="${data[i].model}">${data[i].model}</option>`);
+                        console.log($("#Model"))
+                        if (model != undefined) {
+                            $("#Model").val(model);
+                        }
+                    }
+                    //$("#Brand").append(`<option value="adsa">asda</option>`);
+                }
+            })
+            //alert($("#Brand".val));
+        }
+        $(document).on('click', '#CloseCarB', function () {
+            //$("#dialog").hide();
+            $("#dialog").dialog('close');
+
+            //alert("asd");
+        });
+        $(document).on('click', '#EditCarB', function () {
+            //$("#dialog").hide();
+            var url = '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }';
+            $.ajax({
+                type: "PUT",
+                url: "http://localhost:5000/api/Cars/UpdateCar",
+                data: '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }',
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    $("#dialog").dialog('close');
+                    start();
+
+
+                    //$("#Brand option:selected").text(data.brand.name);
+                    //$("#Brand").append(`<option value="adsa">asda</option>`);
+                }
+            })
+
+            //alert("asd");
+        });
+        $(document).on('click', '#delete', function () {
+            var url = "http://localhost:5000/api/Cars/Delete/" + $(this).attr("data");
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:5000/api/Cars/Delete/" + $(this).attr("data"),
+                success: function (data) {
+                    start();
+                }
+            })
+        });
+        //alert('asd');
+                        //$(document).on('change', "#Brand", function () {
+                        //    var ss = $("#Brand").val("selected");
+                        //    console.log(ss)
+                        //    //alert($("#Brand:selected").text());
+                        //}
+                        //);
     </script>
 </div>
