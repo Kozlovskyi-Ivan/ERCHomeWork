@@ -2,320 +2,396 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
+    <div class="text-center">
 
-    <div>
-        <button id="opener" class="btn btn-info">Add New Car</button>
-        <button id="Excel" class="btn btn-info">Add Models From Excel</button>
-        <button id="GenerateCars" class="btn btn-info">Generate cars</button><br /><br />
         <div>
-            <label>Sort by:</label>
-            <select id="Sort">
-                <option value="Number">Number</option>
-                <option value="Mileage">Mileage</option>
-                <option value="Data">Data</option>
-                <option value="Brand">Brand</option>
-                <option value="Model">Model</option>
-            </select>
+            <button id="opener" class="btn btn-info">Add New Car</button>
+            <button id="Excel" class="btn btn-info">Add Models From Excel</button>
+            <button id="GenerateCars" class="btn btn-info">Generate cars</button><br /><br />
+            <div>
+                <label>Sort by:</label>
+                <select id="Sort">
+                    <option value="Number">Number</option>
+                    <option value="Mileage">Mileage</option>
+                    <option value="Data">Data</option>
+                    <option value="Brand">Brand</option>
+                    <option value="Model">Model</option>
+                </select>
+            </div>
+            <br />
+            <table id="car_table" class="center">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Number</th>
+                        <th>Mileage</th>
+                        <th>Date</th>
+                        <th>Model</th>
+                        <th>Brand</th>
+                    </tr>
+                </thead>
+                <tbody id="SetCarList">
+                    <tr id="LoadingStatus" @*style="color:red"*@></tr>
+                </tbody>
+            </table>
         </div>
-        <br />
-        <table id="car_table" class="center">
-            <thead>
-                <tr>
-                    <th>Number</th>
-                    <th>Mileage</th>
-                    <th>Data</th>
-                    <th>Model</th>
-                    <th>Brand</th>
-                </tr>
-            </thead>
-            <tbody id="SetCarList">
-                <tr id="LoadingStatus" @*style="color:red"*@></tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="dialog" title="Create new car" >
-        <p class="validateTips">All fields are required.</p>
-        <fieldset>
-            <div>
-                <label for="Number">Number</label>
-                <input type="text" name="NumberD" id="NumberD" value="" class="text ui-widget-content ui-corner-all">
-            </div>
-            <div>
-                <label for="Mileage">Mileage</label>
-                <input type="text" name="Mileage" id="Mileage" value="" class="text ui-widget-content ui-corner-all">
-            </div>
-            <div>
-                <label for="Data">Data (dd/mm/yyyy)/(dd.mm.yyyy)</label>
-                <input type="datetime" name="Data" id="Data" value="" class="text ui-widget-content ui-corner-all">
-            </div>
-            <div>
-                <label for="Brand">Brand</label>
-                <select id="Brand">
-                </select>
-            </div>
-            <div>
-                <label for="Model">Model</label>
-                <select id="Model">
-                </select>
-            </div>
-            <button id="AddCarB">Add Car</button>
-            <button id="EditCarB" value="">Edit Car</button>
-            <button id="CloseCarB" class="ui-widget-content ui-corner-all">Close</button>
+        <div id="dialog" title="Create new car">
+            <p class="validateTips">All fields are required.</p>
+            <fieldset>
+                <div>
+                    <label>ID:</label>
+                    <label id="CarId" value=""></label>
+                </div>
+                <div>
+                    <label for="Number">Number</label>
+                    <input type="text" name="NumberD" id="NumberD" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Mileage">Mileage</label>
+                    <input type="text" name="Mileage" id="Mileage" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Data">Date (dd/mm/yyyy)/(dd.mm.yyyy)</label>
+                    <input type="text" name="Data" id="Data" value="" class="text ui-widget-content ui-corner-all">
+                </div>
+                <div>
+                    <label for="Brand">Brand</label>
+                    <select id="Brand">
+                    </select>
+                </div>
+                <div>
+                    <label for="Model">Model</label>
+                    <select id="Model">
+                    </select>
+                </div>
+                <button id="AddCarB">Add Car</button>
+                <button id="EditCarB" value="">Edit Car</button>
+                <button id="CloseCarB" class="ui-widget-content ui-corner-all">Close</button>
 
-            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-    </div>
-    <div id="dialogdelete" title="Delete Car">
-        <fieldset>
-            <div>
-                <label id="NumberDelete" value="">Number</label>
-            </div>
-            <button id="deletecar">Delete</button>
-            <button id="CloseDelete">Close</button>
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </div>
+        <div id="dialogdelete" title="Delete Car">
+            <fieldset>
+                <div>
+                    <label id="NumberDelete" value="">Number</label>
+                </div>
+                <button id="deletecar">Delete</button>
+                <button id="CloseDelete">Close</button>
 
-            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-    </div>
-    <script type="text/javascript">
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </div>
+        <div id="pageList">
+        </div>
+        <script type="text/javascript">
 
 
-        $("#LoadingStatus").html("Loading....");
-        $(document).ready(start()
-        );
-        $("#Sort").change(function () {
-            start();
-        });
-        function start() {
-            $.getJSON("http://localhost:5000/api/Cars/GetCars/" + $("#Sort option:selected").text(), function (data) {
-                $('#SetCarList').empty();
-                var car_data = '';
-                $.each(data, function (key, value) {
-                    car_data += '<tr>';
-                    car_data += '<td>' + value.number + '</td>';
-                    car_data += '<td>' + value.mileage + '</td>';
-                    car_data += '<td>' + value.data + '</td>';
-                    car_data += '<td>' + value.model + '</td>';
-                    car_data += '<td>' + value.brand + '</td>';
-                    car_data += "<td>" + "<a href='#' id='opener' class='btn btn-warning' data='" + value.number + "' ><span class='glyphicon glyphicon-edit'>Edit</span></a>" + "</td>";
-                    car_data += "<td>" + "<a href='#' id='delete' class='btn btn-danger' data='" + value.number + "'><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
-                    car_data += '</tr>';
+            $("#LoadingStatus").html("Loading....");
+            $(document).ready(function () { GetPageNumber(); start(); }
+            );
+            $("#Sort").change(function () {
+                start();
+            });
+            function start(page=0) {
+                //var temppage = 0;
+                var temppage = page;
+                $.getJSON("http://localhost:5000/api/Cars/GetCars/" + $("#Sort option:selected").text() + "/" + temppage, function (data) {
+                    $('#SetCarList').empty();
+                    var car_data = '';
+                    $.each(data, function (key, value) {
+                        car_data += '<tr>';
+                        car_data += '<td>' + value.id + '</td>';
+                        car_data += '<td>' + value.number + '</td>';
+                        car_data += '<td>' + value.mileage + '</td>';
+                        car_data += '<td>' + dateConvert(value.data) + '</td>';
+                        //car_data += '<td>' + value.model + '</td>';
+                        car_data += '<td>' + value.carModel.model + '</td>';
+
+                        //car_data += '<td>' + value.brand + '</td>';
+                        car_data += '<td>' + value.carModel.brand.name + '</td>';
+
+                        car_data += "<td>" + "<a href='#' id='opener' class='btn btn-warning' data='" + value.number + "' ><span class='glyphicon glyphicon-edit'>Edit</span></a>" + "</td>";
+                        car_data += "<td>" + "<a href='#' id='delete' class='btn btn-danger' data='" + value.number + "'><span class='glyphicon glyphicon-trash'>Delete</span></a>" + "</td>";
+                        car_data += '</tr>';
+                    });
+                    $('#SetCarList').append(car_data);
+                    $("#LoadingStatus").html(" ");
+
                 });
-                $('#SetCarList').append(car_data);
-                $("#LoadingStatus").html(" ");
-
-            });
-        }
-        $(function () {
-            $("#dialog").dialog({
-                autoOpen: false,
-                show: {
-                    effect: "blind",
-                    duration: 1000
-                },
-                hide: {
-                    effect: "blind",
-                    duration: 1000, function() {
-                        $('#dialog').html('');
-                    }
-                }
-            });
-        });
-        $(function () {
-            $("#dialogdelete").dialog({
-                autoOpen: false,
-                show: {
-                    effect: "blind",
-                    duration: 1000
-                },
-                hide: {
-                    effect: "blind",
-                    duration: 1000, function() {
-                        $('#dialog').html('');
-                    }
-                }
-            });
-        });
-        $(document).on('click', '#opener', function () {
-
-            $("#AddCarB").show();
-            $("#EditCarB").hide();
-            $("#dialog").dialog("open");
-
-            $("#EditCarB").val($(this).attr("data"));
-
-            $("#NumberD").val(null);
-            $("#Mileage").val(null);
-            $("#Data").val(null);
-            $("#Model").empty();
-            $("#Brand").empty();
-
-            var url = "http://localhost:5000/api/Cars/Car/" + $(this).attr("data");
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:5000/api/Cars/Brands",
-                success: function (data) {
-                    $("#Brand").append(`<option value=""</option>`);
-                    for (var i = 0; i < data.length; i++) {
-                        console.log(data[i].name);
-                        $("#Brand").append(`<option value="${data[i].name}">${data[i].name}</option>`);
-                    }
-                },
-                error: function (e) {
-                    alert(e.responseText);
-                }
-            })
-            if ($(this).attr("data") != undefined) {
-                $("#AddCarB").hide();
-                $("#EditCarB").show();
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    success: function (data) {
-                        $("#NumberD").val(data.number);
-                        $("#Mileage").val(data.mileage);
-                        $("#Data").val(data.data);
-                        $("#Brand").val(data.brand);
-                        ModelLoad(data.model);
-                    },
-                    error: function (e) {
-                        alert(e.responseText);
-                    }
-                })
             }
-        });
-
-        $(document).on('click', '#AddCarB', function () {
-            if (CheckForEditAnd() == true) {
-                $.ajax({
-                    type: "POST",
-                    url: "http://localhost:5000/api/Cars/AddCar",
-                    data: '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }',
-                    contentType: "application/json; charset=utf-8",
-                    success: function () {
-                        $("#dialog").dialog('close');
-                        start();
+            $(function () {
+                $("#dialog").dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
                     },
-                    error: function (e) {
-                        alert(e.responseText);
-                    }
-                })
-            }
-        });
-
-        $("#Brand").change(function () {
-            ModelLoad();
-        });
-
-        function ModelLoad(model) {
-            $("#Model").empty();
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:5000/api/Cars/Models/" + $("#Brand option:selected").text(),
-                success: function (data) {
-                    $("#Model").empty();
-
-                    $("#Model").append(`<option value=""</option>`);
-                    for (var i = 0; i < data.length; i++) {
-                        $("#Model").append(`<option value="${data[i].model}">${data[i].model}</option>`);
-                        if (model != undefined) {
-                            $("#Model").val(model);
+                    hide: {
+                        effect: "blind",
+                        duration: 1000, function() {
+                            $('#dialog').html('');
                         }
                     }
-                },
-                error: function (e) {
-                    alert(e.responseText);
-                }
-            })
-        }
-        $(document).on('click', '#CloseCarB', function () {
-            $("#dialog").dialog('close');
-        });
+                });
+            });
+            $(function () {
+                $("#dialogdelete").dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "blind",
+                        duration: 1000, function() {
+                            $('#dialog').html('');
+                        }
+                    }
+                });
+            });
+            $(document).on('click', '#opener', function () {
 
-        $(document).on('click', '#EditCarB', function () {
-            if (CheckForEditAnd() == true) {
+                $("#AddCarB").show();
+                $("#EditCarB").hide();
+                $("#dialog").dialog("open");
+
+                $("#EditCarB").val($(this).attr("data"));
+
+                $("#NumberD").val(null);
+                $("#Mileage").val(null);
+                $("#Data").val(null);
+                $("#Model").empty();
+                $("#Brand").empty();
+                $("#CarId").empty();
+
+
+                var url = "http://localhost:5000/api/Cars/Car/" + $(this).attr("data");
                 $.ajax({
-                    type: "PUT",
-                    url: "http://localhost:5000/api/Cars/UpdateCar/",
-                    data: '{"Number": "' + $("#NumberD").val() + '", "OldNumber": "' + $("#EditCarB").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }',
-                    contentType: "application/json; charset=utf-8",
-                    success: function () {
-                        $("#dialog").dialog('close');
-                        start();
+                    type: "GET",
+                    url: "http://localhost:5000/api/Cars/Brands",
+                    success: function (data) {
+                        $("#Brand").append(`<option value=""</option>`);
+                        for (var i = 0; i < data.length; i++) {
+                            console.log(data[i].name);
+                            $("#Brand").append(`<option value="${data[i].name}">${data[i].name}</option>`);
+                        }
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+                if ($(this).attr("data") != undefined) {
+                    $("#AddCarB").hide();
+                    $("#EditCarB").show();
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        success: function (data) {
+                            //$("#CarId").val(data.id);
+                            $("#CarId").text(data.id);
+                            $("#NumberD").val(data.number);
+                            $("#Mileage").val(data.mileage);
+                            //$("#Data").val(data.data);
+                            $("#Data").val(dateConvert(data.data));
+
+                            $("#Brand").val(data.carModel.brand.name);
+                            ModelLoad(data.carModel.model);
+                        },
+                        error: function (e) {
+                            alert(e.responseText);
+                        }
+                    })
+                }
+            });
+            function dateConvert(date) {
+                const parts = date.split(/[- : T]/);
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            //$(document).on('click', '#AddCarB', function () {
+            //    if (CheckForEditAnd() == true) {
+            //        $.ajax({
+            //            type: "POST",
+            //            url: "http://localhost:5000/api/Cars/AddCar",
+            //            data: '{"Number": "' + $("#NumberD").val() + '", "Data": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Brand": "' + $("#Brand option:selected").text() + '", "Model": "' + $("#Model option:selected").text() + '" }',
+            //            contentType: "application/json; charset=utf-8",
+            //            success: function () {
+            //                $("#dialog").dialog('close');
+            //                start();
+            //            },
+            //            error: function (e) {
+            //                alert(e.responseText);
+            //            }
+            //        })
+            //    }
+            //});
+            $(document).on('click', '#AddCarB', function () {
+                if (CheckForEditAnd() == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://localhost:5000/api/Cars/AddCar",
+                        data: '{"Number": "' + $("#NumberD").val() + '", "Date": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Model": "' + $("#Model option:selected").text() + '" }',
+                        contentType: "application/json; charset=utf-8",
+                        success: function () {
+                            $("#dialog").dialog('close');
+                            GetPageNumber()
+                            start();
+                        },
+                        error: function (e) {
+                            alert(e.responseText);
+                        }
+                    })
+                }
+            });
+
+            $("#Brand").change(function () {
+                ModelLoad();
+            });
+
+            function ModelLoad(model) {
+                $("#Model").empty();
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:5000/api/Cars/Models/" + $("#Brand option:selected").text(),
+                    success: function (data) {
+                        $("#Model").empty();
+
+                        $("#Model").append(`<option value=""</option>`);
+                        for (var i = 0; i < data.length; i++) {
+                            $("#Model").append(`<option value="${data[i].model}">${data[i].model}</option>`);
+                            if (model != undefined) {
+                                $("#Model").val(model);
+                            }
+                        }
                     },
                     error: function (e) {
                         alert(e.responseText);
                     }
                 })
             }
-        });
+            $(document).on('click', '#CloseCarB', function () {
+                $("#dialog").dialog('close');
+            });
 
-        $(document).on('click', '#delete', function () {
-            $("#dialogdelete").dialog('open');
-            console.log($(this).attr("data"));
-            $("#NumberDelete").val($(this).attr("data"));
-        });
+            $(document).on('click', '#EditCarB', function () {
+                if (CheckForEditAnd() == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://localhost:5000/api/Cars/UpdateCar/",
+                        data: '{"Id": ' + $("#CarId").text() + ', "Number": "' + $("#NumberD").val() + '", "Date": "' + $("#Data").val() + '", "Mileage": ' + $("#Mileage").val() + ', "Model": "' + $("#Model option:selected").text() + '" }',
+                        contentType: "application/json; charset=utf-8",
+                        success: function () {
+                            $("#dialog").dialog('close');
+                            start();
+                        },
+                        error: function (e) {
+                            alert(e.responseText);
+                        }
+                    })
+                }
+            });
 
-        $(document).on('click', '#deletecar', function () {
-            var url = "http://localhost:5000/api/Cars/Delete/" + $(this).attr("data");
-            $.ajax({
-                type: "DELETE",
-                url: "http://localhost:5000/api/Cars/Delete/" + $("#NumberDelete").val(),
-                success: function (data) {
-                    $("#dialogdelete").dialog('close');
-                    start();
-                },
-                error: function (e) {
-                    alert(e.responseText);
+            $(document).on('click', '#delete', function () {
+                $("#dialogdelete").dialog('open');
+                console.log($(this).attr("data"));
+                $("#NumberDelete").val($(this).attr("data"));
+                $("#NumberDelete").text($(this).attr("data"));
+
+            });
+
+            $(document).on('click', '#deletecar', function () {
+                var url = "http://localhost:5000/api/Cars/Delete/" + $(this).attr("data");
+                $.ajax({
+                    type: "DELETE",
+                    url: "http://localhost:5000/api/Cars/Delete/" + $("#NumberDelete").val(),
+                    success: function (data) {
+                        $("#dialogdelete").dialog('close');
+                        GetPageNumber();
+                        start();
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+            });
+            $(document).on('click', '#CloseDelete', function () {
+                $("#dialogdelete").dialog('close');
+            });
+            function CheckForEditAnd() {
+                console.log($("#Brand").val() + " ads");
+                if (($("#NumberD").val() == "") ||
+                    ($("#Mileage").val() == "") ||
+                    ($("#Data").val() == "") ||
+                    ($("#Model").val() == "") ||
+                    ($("#Brand").val() == "")) {
+                    alert("Fieldes is empty")
+                    return false;
                 }
-            })
-        });
-        $(document).on('click', '#CloseDelete', function () {
-            $("#dialogdelete").dialog('close');
-        });
-        function CheckForEditAnd() {
-            console.log($("#Brand").val()+" ads");
-            if (($("#NumberD").val() == "") ||
-                ($("#Mileage").val() == "") ||
-                ($("#Data").val() == "") ||
-                ($("#Model").val() == "") ||
-                ($("#Brand").val() == "")) {
-                alert("Fieldes is empty")
-                return false;
+                else if (!(/^[A-Z]{2}[0-9]{4}[A-Z]{2}$/.test($("#NumberD").val()))) {
+                    alert("Wrong Number");
+                    return false;
+                } else if (!(/^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/.test($("#Data").val()))) {
+                    alert("Wrong Data");
+                    return false;
+                }
+                else { return true; }
             }
-            else if (!(/^[A-Z]{2}[0-9]{4}[A-Z]{2}$/.test($("#NumberD").val()))) {
-                alert("Wrong Number");
-                return false;
-            } else if (!(/^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/.test($("#Data").val()))) {
-                alert("Wrong Data");
-                return false;
+            $(document).on('click', '#Excel', function () {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:5000/api/Cars/GetFromExcel/",
+                    success: function () {
+                        alert("Add Models from Excel");
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+            });
+            $(document).on('click', '#GenerateCars', function () {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:5000/api/Cars/GenerateCars/",
+                    success: function () {
+                        //alert("Add Models from Excel");
+                        GetPageNumber();
+                        start();
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+            });
+            function GetPageNumber() {
+                var listnum = 0;
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:5000/api/Cars/GetCarsCount/",
+                    success: function (data) {
+                        PageList(Math.ceil(data) / 10);
+                        console.log(data/10+"faf");
+                        listnum =Math.ceil((data) / 10);
+                    },
+                    error: function (e) {
+                        alert(e.responseText);
+                    }
+                })
+                return listnum;
             }
-            else { return true; }
-        }
-        $(document).on('click', '#Excel', function () {
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:5000/api/Cars/GetFromExcel/",
-                success: function () {
-                    alert("Add Models from Excel");
-                },
-                error: function (e) {
-                    alert(e.responseText);
+            function PageList(pagenumber) {
+                var list = "";
+                console.log(list);
+                for (var i = 0; i < pagenumber; i++) {
+                    list += "<button id='page' class='btn btn-info'>" +(i+1)+ "</button>  ";
                 }
-            })
-        });
-        $(document).on('click', '#GenerateCars', function () {
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:5000/api/Cars/GenerateCars/",
-                success: function () {
-                    //alert("Add Models from Excel");
-                    start();
-                },
-                error: function (e) {
-                    alert(e.responseText);
-                }
-            })
-        });
-    </script>
-</div>
+                console.log(list);
+                $('#pageList').empty();
+                $('#pageList').append(list);
+            }
+            $(document).on('click', '#page', function () {
+                console.log($(this).text());
+                start($(this).text()-1);
+            });
+        </script>
+    </div>

@@ -28,7 +28,6 @@ namespace ERCHomeWork
             services.AddDbContext<CarsContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
             //services.AddMvc(option=>option.EnableEndpointRouting=false);
 
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
